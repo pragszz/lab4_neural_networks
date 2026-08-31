@@ -24,28 +24,39 @@ def load_data(data, test_size):
     return X_train, y_train, X_test, y_test
 
 def gradient_descent_numpy(X, y, X_test, y_test, lr=0.1, epochs=200):
-    # X = X.numpy()
-    # y = y.numpy()
-    # Xt = X_test.numpy()
-    # yt = y_test.numpy()
+    X = X.numpy()
+    y = y.numpy()
+    X_test = X_test.numpy()
+    y_test = y_test.numpy()
     n, d = X.shape
+
+    # Make sure y has shape (n, 1)
+    y = y.reshape(-1, 1)
+    y_test = y_test.reshape(-1, 1)
 
     w = np.zeros((d, 1))
     b = 0.0
     losses = []
 
     for _ in range(epochs):
-        pred = X @ w + b                      
-        err = pred - y                        
-        loss = np.mean(err ** 2)              
+        # Forward pass
+        pred = X @ w + b
+        err = pred - y
+
+        # Training loss
+        loss = np.mean(err ** 2)
         losses.append(loss)
 
-        
-        grad_w = (2.0 / n) * (X.T @ err)      
-        grad_b = (2.0 / n) * np.sum(err)      
+        # Gradients
+        grad_w = (2.0 / n) * (X.T @ err)
+        grad_b = (2.0 / n) * np.sum(err)
 
+        # Update
         w -= lr * grad_w
         b -= lr * grad_b
 
-    test_mse = np.mean((X @ w + b - y) ** 2)
+    # Test MSE — use X_test and y_test
+    test_pred = X_test @ w + b
+    test_mse = np.mean((test_pred - y_test) ** 2)
+
     return w, b, losses, test_mse
